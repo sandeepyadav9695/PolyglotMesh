@@ -8,7 +8,6 @@ public class PolyglotMeshApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PolyglotMeshApplication.class, args);
-		System.out.println("hello");
 	}
 
 }
