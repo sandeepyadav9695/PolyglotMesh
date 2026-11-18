@@ -6,7 +6,6 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- Spring Boot Parent -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -14,23 +13,20 @@
 		<relativePath/>
 	</parent>
 
-	<!-- Project Information -->
 	<groupId>com.withsky</groupId>
 	<artifactId>PolyglotMesh</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>PolyglotMesh</name>
 	<description>GraalVM Multi-Language Runtime Sandbox</description>
 
-	<!-- Properties -->
 	<properties>
 		<java.version>17</java.version>
-		<graalvm.version>23.1.2</graalvm.version>
+		<graalvm.version>23.1.12</graalvm.version>
 	</properties>
 
-	<!-- Dependencies -->
 	<dependencies>
 
-		<!-- Spring Boot WebFlux -->
+		<!-- Spring WebFlux -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
@@ -49,7 +45,7 @@
 			<version>${graalvm.version}</version>
 		</dependency>
 
-		<!-- GraalVM JavaScript Runtime -->
+		<!-- JavaScript Runtime -->
 		<dependency>
 			<groupId>org.graalvm.polyglot</groupId>
 			<artifactId>js-community</artifactId>
@@ -58,7 +54,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- GraalVM Python Runtime -->
+		<!-- Python Runtime -->
 		<dependency>
 			<groupId>org.graalvm.polyglot</groupId>
 			<artifactId>python-community</artifactId>
@@ -67,7 +63,7 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Spring Boot Testing -->
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -76,7 +72,6 @@
 
 	</dependencies>
 
-	<!-- Build Configuration -->
 	<build>
 		<plugins>
 
