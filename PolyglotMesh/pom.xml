@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.5.16</version>
 		<relativePath/>
 	</parent>
 
@@ -45,19 +45,19 @@
 			<version>${graalvm.version}</version>
 		</dependency>
 
-		<!-- JavaScript Runtime -->
+		<!-- GraalJS runtime -->
 		<dependency>
 			<groupId>org.graalvm.polyglot</groupId>
-			<artifactId>js-community</artifactId>
+			<artifactId>js</artifactId>
 			<version>${graalvm.version}</version>
 			<type>pom</type>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Python Runtime -->
+		<!-- GraalPy runtime -->
 		<dependency>
 			<groupId>org.graalvm.polyglot</groupId>
-			<artifactId>python-community</artifactId>
+			<artifactId>python</artifactId>
 			<version>${graalvm.version}</version>
 			<type>pom</type>
 			<scope>runtime</scope>

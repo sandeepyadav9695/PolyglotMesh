@@ -10,7 +10,8 @@ public record ExecutionResponse(
 
         String error,
 
-        long executionTimeMs
+        long executionTimeMs,
+
+        boolean resourceExhausted
 
 ) {}
-

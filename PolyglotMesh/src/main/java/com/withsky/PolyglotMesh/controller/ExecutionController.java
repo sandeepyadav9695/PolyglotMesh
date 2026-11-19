@@ -1,9 +1,9 @@
 package com.withsky.PolyglotMesh.controller;
 
+
 import com.withsky.PolyglotMesh.dto.ExecutionRequest;
 import com.withsky.PolyglotMesh.dto.ExecutionResponse;
 import com.withsky.PolyglotMesh.service.PolyglotService;
-
 import jakarta.validation.Valid;
 
 import org.springframework.http.MediaType;
@@ -31,8 +31,17 @@ public class ExecutionController {
     public Mono<ExecutionResponse> executeCode(
             @Valid @RequestBody ExecutionRequest request
     ) {
+
         return Mono.fromCallable(
                 () -> polyglotService.execute(request)
         ).subscribeOn(Schedulers.boundedElastic());
+
+    }
+
+    @GetMapping("/health")
+    public Mono<String> health() {
+
+        return Mono.just("PolyglotMesh Backend Running");
+
     }
 }
