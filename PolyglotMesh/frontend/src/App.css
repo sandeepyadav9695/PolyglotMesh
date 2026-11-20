@@ -262,4 +262,26 @@ footer {
     padding: 8px;
     font-size: 12px;
   }
+
+  .security-error {
+    background: #450a0a;
+    border: 1px solid #991b1b;
+    padding: 14px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .security-error strong {
+    color: #fca5a5;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .console-error {
+    color: #fecaca;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
 }

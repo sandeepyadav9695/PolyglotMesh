@@ -293,13 +293,25 @@ console.log("Addition:", a + b);`
 
                                 )}
 
+
                                 {result.error && (
 
-                                    <pre className="console-error">
-                                        {result.error}
-                                    </pre>
+                                    <div className="security-error">
+
+                                        <strong>
+                                            {result.resourceExhausted
+                                                ? 'SANDBOX RESOURCE LIMIT'
+                                                : 'EXECUTION ERROR'}
+                                        </strong>
+
+                                        <pre className="console-error">
+                                              {result.error}
+                                        </pre>
+
+                                    </div>
 
                                 )}
+
 
                                 <div className="execution-info">
 
