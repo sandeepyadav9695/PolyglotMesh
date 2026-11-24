@@ -1,0 +1,25 @@
+package com.withsky.PolyglotMesh.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+@Configuration
+public class ThreadPoolConfig {
+
+    @Bean(destroyMethod = "shutdown")
+    public ThreadPoolExecutor executionThreadPoolExecutor() {
+
+        return new ThreadPoolExecutor(
+                2,
+                4,
+                60,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(20),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+    }
+}
