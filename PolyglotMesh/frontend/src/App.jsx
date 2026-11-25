@@ -1,350 +1,202 @@
-import { useState } from 'react';
 
-import Editor from '@monaco-editor/react';
-
+import { useCallback, useState } from "react";
 import { executeCode } from "./services/executionService";
 
-function App() {
+import Navbar from "./components/Navbar";
+import Sidebar from "./components/Sidebar";
+import LanguageSelector from "./components/LanguageSelector";
+import CodeEditor from "./components/CodeEditor";
+import OutputConsole from "./components/OutputConsole";
 
-    const [language, setLanguage] = useState('python');
+import "./App.css";
 
-    const [code, setCode] = useState({
-        python:
-            `print("Hello from PolyglotMesh!")
+const INITIAL_CODE = {
+    python: `print("Hello from PolyglotMesh!")
 
 a = 10
 b = 20
 
-print("Addition:", a + b)`,
-
-        javascript:
-            `console.log("Hello from GraalJS!");
+print("Addition:", a + b)
+`,
+    javascript: `console.log("Hello from GraalJS!");
 
 const a = 100;
 const b = 200;
 
-console.log("Addition:", a + b);`
-    });
+console.log("Addition:", a + b);
+`,
+};
 
+function App() {
+    const [language, setLanguage] = useState("python");
+    const [code, setCode] = useState(INITIAL_CODE);
     const [result, setResult] = useState(null);
-
     const [loading, setLoading] = useState(false);
+    const [activeSection, setActiveSection] = useState("playground");
 
-    const [activeTab, setActiveTab] = useState('editor');
-
-    const handleLanguageChange = (selectedLanguage) => {
-
-        setLanguage(selectedLanguage);
-
+    const handleLanguageChange = useCallback((nextLanguage) => {
+        setLanguage(nextLanguage);
         setResult(null);
+    }, []);
 
-    };
-
-    const handleCodeChange = (value) => {
-
-        setCode(previous => ({
+    const handleCodeChange = useCallback((value) => {
+        setCode((previous) => ({
             ...previous,
-            [language]: value || ''
+            [language]: value ?? "",
         }));
-
-    };
+    }, [language]);
 
     const handleRunCode = async () => {
+        if (loading) return;
 
-        setLoading(true);
+        const currentCode = code[language];
 
-        setResult(null);
-
-        setActiveTab('output');
-
-        try {
-
-            const response = await executeCode(
-                language,
-                code[language]
-            );
-
-            setResult(response);
-
-        } catch (error) {
-
+        if (!currentCode.trim()) {
             setResult({
                 success: false,
-                output: '',
-                error: error.message,
-                executionTimeMs: 0
+                output: "",
+                error: "Please enter some code before execution.",
+                executionTimeMs: 0,
+                resourceExhausted: false,
             });
-
-        } finally {
-
-            setLoading(false);
-
+            return;
         }
 
+        setLoading(true);
+        setResult(null);
+
+        try {
+            // Preserve the existing service signature and backend contract.
+            const response = await executeCode(language, currentCode);
+            setResult(response);
+        } catch (error) {
+            setResult({
+                success: false,
+                output: "",
+                error:
+                    error?.response?.data?.message ||
+                    error?.response?.data?.error ||
+                    error?.message ||
+                    "Unable to execute code. Please check the backend connection.",
+                executionTimeMs: 0,
+                resourceExhausted: false,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleReset = () => {
+        setCode((previous) => ({
+            ...previous,
+            [language]: INITIAL_CODE[language],
+        }));
+        setResult(null);
     };
 
     return (
+        <div className="app-shell">
+            <Navbar />
 
-        <div className="app">
+            <div className="app-layout">
+                <Sidebar
+                    activeSection={activeSection}
+                    onSectionChange={setActiveSection}
+                />
 
-            {/* Navbar */}
+                <main className="main-content">
+                    <section className="welcome-section">
+                        <div>
+                            <div className="breadcrumb">
+                                Home <span>/</span> Code Playground
+                            </div>
 
-            <header className="navbar">
+                            <h1>Code Playground</h1>
 
-                <div className="brand">
-
-                    <span className="brand-icon">
-                        {'</>'}
-                    </span>
-
-                    <div>
-                        <h2>PolyglotMesh</h2>
-                        <small>Multi-Language Runtime</small>
-                    </div>
-
-                </div>
-
-                <div className="nav-right">
-
-                    <span className="status">
-                        ● Local Runtime
-                    </span>
-
-                    <span className="version">
-                        v1.0
-                    </span>
-
-                </div>
-
-            </header>
-
-            {/* Main Dashboard */}
-
-            <main className="dashboard">
-
-                <section className="welcome">
-
-                    <div>
-                        <h1>Polyglot Code Playground</h1>
-
-                        <p>
-                            Write, execute and test multiple
-                            programming languages in one environment.
-                        </p>
-                    </div>
-
-                    <button
-                        className="run-button"
-                        onClick={handleRunCode}
-                        disabled={loading}
-                    >
-
-                        {loading ? 'Executing...' : '▶ Run Code'}
-
-                    </button>
-
-                </section>
-
-                {/* Language Tabs */}
-
-                <section className="editor-card">
-
-                    <div className="toolbar">
-
-                        <div className="language-tabs">
-
-                            <button
-                                className={
-                                    language === 'python'
-                                        ? 'language-tab active'
-                                        : 'language-tab'
-                                }
-                                onClick={() =>
-                                    handleLanguageChange('python')
-                                }
-                            >
-                                🐍 Python
-                            </button>
-
-                            <button
-                                className={
-                                    language === 'javascript'
-                                        ? 'language-tab active'
-                                        : 'language-tab'
-                                }
-                                onClick={() =>
-                                    handleLanguageChange('javascript')
-                                }
-                            >
-                                JS JavaScript
-                            </button>
-
+                            <p>
+                                Practice, write and execute Python and JavaScript
+                                programs in your own polyglot environment.
+                            </p>
                         </div>
 
-                        <span className="language-label">
-                            {language.toUpperCase()}
-                        </span>
+                        <div className="runtime-indicator">
+                            <span className="status-dot" />
+                            Runtime Environment
+                        </div>
+                    </section>
 
-                    </div>
+                    <section className="workspace">
+                        <div className="workspace-header">
+                            <div>
+                                <h2>Online Compiler</h2>
+                                <p>Write your code and execute it instantly.</p>
+                            </div>
 
-                    {/* Monaco Editor */}
+                            <div className="workspace-actions">
+                                <button
+                                    type="button"
+                                    className="secondary-button"
+                                    onClick={handleReset}
+                                    disabled={loading}
+                                >
+                                    ↺ Reset
+                                </button>
 
-                    <div className="editor-container">
+                                <button
+                                    type="button"
+                                    className="run-button"
+                                    onClick={handleRunCode}
+                                    disabled={loading}
+                                >
+                                    {loading ? "Executing..." : "▶ Run Code"}
+                                </button>
+                            </div>
+                        </div>
 
-                        <Editor
-                            height="440px"
-
-                            language={
-                                language === 'python'
-                                    ? 'python'
-                                    : 'javascript'
-                            }
-
-                            theme="vs-dark"
-
-                            value={code[language]}
-
-                            onChange={handleCodeChange}
-
-                            options={{
-                                fontSize: 15,
-                                minimap: {
-                                    enabled: true
-                                },
-                                automaticLayout: true,
-                                scrollBeyondLastLine: false,
-                                wordWrap: 'on',
-                                padding: {
-                                    top: 20
-                                },
-                                tabSize: 4,
-                                formatOnPaste: true,
-                                formatOnType: true
-                            }}
+                        <LanguageSelector
+                            language={language}
+                            onLanguageChange={handleLanguageChange}
                         />
 
-                    </div>
+                        <CodeEditor
+                            language={language}
+                            value={code[language]}
+                            onChange={handleCodeChange}
+                        />
 
-                </section>
+                        <OutputConsole
+                            result={result}
+                            loading={loading}
+                        />
+                    </section>
 
-                {/* Output Console */}
+                    <section className="feature-grid">
+                        <article className="feature-card">
+                            <span className="feature-icon">⌘</span>
+                            <h3>Multi-language</h3>
+                            <p>Write and execute Python and JavaScript code.</p>
+                        </article>
 
-                <section className="output-card">
+                        <article className="feature-card">
+                            <span className="feature-icon">⚡</span>
+                            <h3>Fast execution</h3>
+                            <p>Execute programs using the GraalVM runtime.</p>
+                        </article>
 
-                    <div className="output-header">
+                        <article className="feature-card">
+                            <span className="feature-icon">◈</span>
+                            <h3>Sandboxed runtime</h3>
+                            <p>Run programs through your backend execution service.</p>
+                        </article>
+                    </section>
 
-                        <div className="output-tabs">
-
-                            <button
-                                className={
-                                    activeTab === 'output'
-                                        ? 'output-tab selected'
-                                        : 'output-tab'
-                                }
-                                onClick={() => setActiveTab('output')}
-                            >
-                                Console Output
-                            </button>
-
-                            <button
-                                className={
-                                    activeTab === 'editor'
-                                        ? 'output-tab selected'
-                                        : 'output-tab'
-                                }
-                                onClick={() => setActiveTab('editor')}
-                            >
-                                Editor
-                            </button>
-
-                        </div>
-
-                        {result && (
-
-                            <span
-                                className={
-                                    result.success
-                                        ? 'success-status'
-                                        : 'error-status'
-                                }
-                            >
-                                {result.success ? 'SUCCESS' : 'FAILED'}
-                            </span>
-
-                        )}
-
-                    </div>
-
-                    <div className="console">
-
-                        {loading ? (
-
-                            <p>Executing your code...</p>
-
-                        ) : result ? (
-
-                            <>
-
-                                {result.output && (
-
-                                    <pre className="console-output">
-                                        {result.output}
-                                    </pre>
-
-                                )}
-
-
-                                {result.error && (
-
-                                    <div className="security-error">
-
-                                        <strong>
-                                            {result.resourceExhausted
-                                                ? 'SANDBOX RESOURCE LIMIT'
-                                                : 'EXECUTION ERROR'}
-                                        </strong>
-
-                                        <pre className="console-error">
-                                              {result.error}
-                                        </pre>
-
-                                    </div>
-
-                                )}
-
-
-                                <div className="execution-info">
-
-                                    Execution time: {
-                                    result.executionTimeMs
-                                } ms
-
-                                </div>
-
-                            </>
-
-                        ) : (
-
-                            <p className="console-placeholder">
-                                Click Run Code to see execution output here.
-                            </p>
-
-                        )}
-
-                    </div>
-
-                </section>
-
-            </main>
-
-            <footer>
-                PolyglotMesh © 2026 | Powered by Spring Boot & GraalVM
-            </footer>
-
+                    <footer className="app-footer">
+                        PolyglotMesh © 2026 · Powered by Spring Boot and GraalVM
+                    </footer>
+                </main>
+            </div>
         </div>
-
     );
-
 }
 
 export default App;
