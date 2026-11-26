@@ -11,20 +11,20 @@ import OutputConsole from "./components/OutputConsole";
 import "./App.css";
 
 const INITIAL_CODE = {
-    python: `print("Hello from PolyglotMesh!")
+    python: `print("Hello from Python!")`,
 
-a = 10
-b = 20
+    javascript: `console.log("Hello from JavaScript!");`,
 
-print("Addition:", a + b)
-`,
-    javascript: `console.log("Hello from GraalJS!");
+    java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello from PolyglotMesh Java!");
 
-const a = 100;
-const b = 200;
+        int a = 10;
+        int b = 20;
 
-console.log("Addition:", a + b);
-`,
+        System.out.println("Addition: " + (a + b));
+    }
+}`,
 };
 
 function App() {

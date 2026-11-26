@@ -5,7 +5,6 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.SandboxPolicy;
 import org.graalvm.polyglot.EnvironmentAccess;
 import org.graalvm.polyglot.io.IOAccess;
-
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -20,7 +19,6 @@ public class SandboxConfig {
             ByteArrayOutputStream output,
             ByteArrayOutputStream error
     ) {
-
         if (language == null || output == null || error == null) {
             throw new IllegalArgumentException(
                     "Language and output streams cannot be null"
@@ -41,18 +39,14 @@ public class SandboxConfig {
 
             default:
                 throw new IllegalArgumentException(
-                        "Unsupported language: " + language
+                        "Unsupported GraalVM language: " + language
                 );
         }
 
-        // Select policy according to language support.
-        SandboxPolicy policy;
-
-        if ("python".equals(languageId)) {
-            policy = SandboxPolicy.TRUSTED;
-        } else {
-            policy = SandboxPolicy.CONSTRAINED;
-        }
+        SandboxPolicy policy =
+                "python".equals(languageId)
+                        ? SandboxPolicy.TRUSTED
+                        : SandboxPolicy.CONSTRAINED;
 
         return Context.newBuilder(languageId)
                 .sandbox(policy)

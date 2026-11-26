@@ -1,9 +1,10 @@
 
+
 const languages = [
     { id: "python", label: "Python", icon: "🐍" },
     { id: "javascript", label: "JavaScript", icon: "JS" },
+    { id: "java", label: "Java", icon: "☕" },
 ];
-
 export default function LanguageSelector({
                                              language,
                                              onLanguageChange,

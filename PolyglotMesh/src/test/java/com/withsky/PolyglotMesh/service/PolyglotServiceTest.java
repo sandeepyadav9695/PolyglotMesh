@@ -1,19 +1,33 @@
+
 package com.withsky.PolyglotMesh.service;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import com.withsky.PolyglotMesh.config.SandboxConfig;
 import com.withsky.PolyglotMesh.dto.ExecutionRequest;
 import com.withsky.PolyglotMesh.dto.ExecutionResponse;
 
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PolyglotServiceTest {
 
+    private final SandboxConfig sandboxConfig =
+            new SandboxConfig();
+
+    private final JavaExecutionService javaExecutionService =
+            new JavaExecutionService(
+                    "eclipse-temurin:21-jdk",
+                    10
+            );
+
     private final PolyglotService service =
-            new PolyglotService(new SandboxConfig());
+            new PolyglotService(
+                    sandboxConfig,
+                    javaExecutionService
+            );
 
     @Test
     void shouldExecutePythonSuccessfully() {
@@ -23,8 +37,7 @@ class PolyglotServiceTest {
                 "print('Hello from secure Python')"
         );
 
-        ExecutionResponse response =
-                service.execute(request);
+        ExecutionResponse response = service.execute(request);
 
         assertTrue(response.success());
 
@@ -33,7 +46,6 @@ class PolyglotServiceTest {
                         "Hello from secure Python"
                 )
         );
-
     }
 
     @Test
@@ -44,8 +56,7 @@ class PolyglotServiceTest {
                 "console.log('Hello from secure JavaScript');"
         );
 
-        ExecutionResponse response =
-                service.execute(request);
+        ExecutionResponse response = service.execute(request);
 
         assertTrue(response.success());
 
@@ -54,7 +65,6 @@ class PolyglotServiceTest {
                         "Hello from secure JavaScript"
                 )
         );
-
     }
 
     @Test
@@ -65,13 +75,11 @@ class PolyglotServiceTest {
                 "Java.type('java.lang.System');"
         );
 
-        ExecutionResponse response =
-                service.execute(request);
+        ExecutionResponse response = service.execute(request);
 
         assertFalse(response.success());
 
         assertNotNull(response.error());
-
     }
 
     @Test
@@ -87,11 +95,9 @@ class PolyglotServiceTest {
                 "console.log(typeof globalThis.secretValue);"
         );
 
-        ExecutionResponse firstResponse =
-                service.execute(first);
+        ExecutionResponse firstResponse = service.execute(first);
 
-        ExecutionResponse secondResponse =
-                service.execute(second);
+        ExecutionResponse secondResponse = service.execute(second);
 
         assertTrue(firstResponse.success());
         assertTrue(secondResponse.success());
@@ -99,7 +105,6 @@ class PolyglotServiceTest {
         assertTrue(
                 secondResponse.output().contains("undefined")
         );
-
     }
 
     @Test
@@ -111,12 +116,10 @@ class PolyglotServiceTest {
                 "while (true) {}"
         );
 
-        ExecutionResponse response =
-                service.execute(request);
+        ExecutionResponse response = service.execute(request);
 
         assertFalse(response.success());
 
         assertTrue(response.resourceExhausted());
-
     }
 }

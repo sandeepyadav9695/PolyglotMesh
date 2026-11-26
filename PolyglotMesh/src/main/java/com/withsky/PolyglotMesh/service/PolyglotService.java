@@ -1,10 +1,14 @@
 package com.withsky.PolyglotMesh.service;
+
 import com.withsky.PolyglotMesh.config.SandboxConfig;
 import com.withsky.PolyglotMesh.dto.ExecutionRequest;
 import com.withsky.PolyglotMesh.dto.ExecutionResponse;
+
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.PolyglotException;
+
 import org.springframework.stereotype.Service;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -12,67 +16,62 @@ import java.nio.charset.StandardCharsets;
 public class PolyglotService {
 
     private final SandboxConfig sandboxConfig;
+    private final JavaExecutionService javaExecutionService;
 
-    public PolyglotService(SandboxConfig sandboxConfig) {
+    public PolyglotService(
+            SandboxConfig sandboxConfig,
+            JavaExecutionService javaExecutionService
+    ) {
         this.sandboxConfig = sandboxConfig;
+        this.javaExecutionService = javaExecutionService;
     }
 
     public ExecutionResponse execute(ExecutionRequest request) {
 
-        long startTime = System.nanoTime();
-
         String language = request.language();
         String code = request.code();
 
-        ByteArrayOutputStream output =
-                new ByteArrayOutputStream();
+        // Java uses javac + JVM inside Docker.
+        if ("java".equalsIgnoreCase(language)) {
+            return javaExecutionService.execute(code);
+        }
 
-        ByteArrayOutputStream error =
-                new ByteArrayOutputStream();
+        long startTime = System.nanoTime();
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ByteArrayOutputStream error = new ByteArrayOutputStream();
 
         try {
-
-            // Create a new isolated context for each request
-            try (Context context =
-                         sandboxConfig.createBuilder(
-                                 language,
-                                 output,
-                                 error
-                         ).build()) {
+            try (Context context = sandboxConfig.createBuilder(
+                    language,
+                    output,
+                    error
+            ).build()) {
 
                 String guestLanguage =
-                        "javascript".equals(language)
+                        "javascript".equalsIgnoreCase(language)
+                                || "js".equalsIgnoreCase(language)
                                 ? "js"
                                 : "python";
 
-                // Execute guest code
                 context.eval(guestLanguage, code);
-
             }
-
-            long executionTime =
-                    (System.nanoTime() - startTime) / 1_000_000;
 
             return new ExecutionResponse(
                     true,
                     language,
                     output.toString(StandardCharsets.UTF_8),
                     error.toString(StandardCharsets.UTF_8),
-                    executionTime,
+                    executionTime(startTime),
                     false
             );
 
         } catch (PolyglotException ex) {
 
-            long executionTime =
-                    (System.nanoTime() - startTime) / 1_000_000;
-
-            boolean resourceExhausted =
-                    ex.isResourceExhausted();
+            boolean resourceExhausted = ex.isResourceExhausted();
 
             String message = resourceExhausted
-                    ? "Sandbox resource limit exceeded: "
-                    + ex.getMessage()
+                    ? "Sandbox resource limit exceeded: " + ex.getMessage()
                     : ex.getMessage();
 
             return new ExecutionResponse(
@@ -80,23 +79,26 @@ public class PolyglotService {
                     language,
                     output.toString(StandardCharsets.UTF_8),
                     message,
-                    executionTime,
+                    executionTime(startTime),
                     resourceExhausted
             );
 
         } catch (Exception ex) {
 
-            long executionTime =
-                    (System.nanoTime() - startTime) / 1_000_000;
-
             return new ExecutionResponse(
                     false,
                     language,
                     output.toString(StandardCharsets.UTF_8),
-                    ex.getMessage(),
-                    executionTime,
+                    ex.getMessage() == null
+                            ? "Code execution failed"
+                            : ex.getMessage(),
+                    executionTime(startTime),
                     false
             );
         }
+    }
+
+    private long executionTime(long startTime) {
+        return (System.nanoTime() - startTime) / 1_000_000;
     }
 }
