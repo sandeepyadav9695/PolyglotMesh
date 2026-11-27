@@ -8,8 +8,8 @@ public record ExecutionRequest(
 
         @NotBlank(message = "Language is required")
         @Pattern(
-                regexp = "(?i)python|javascript|js|java",
-                message = "Supported languages: Python, JavaScript and Java"
+                regexp = "(?i)python|javascript|js|java|c",
+                message = "Supported languages: C, Python, JavaScript and Java"
         )
         String language,
 

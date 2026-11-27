@@ -1,3 +1,4 @@
+
 package com.withsky.PolyglotMesh.service;
 
 import com.withsky.PolyglotMesh.config.SandboxConfig;
@@ -17,13 +18,16 @@ public class PolyglotService {
 
     private final SandboxConfig sandboxConfig;
     private final JavaExecutionService javaExecutionService;
+    private final CExecutionService cExecutionService;
 
     public PolyglotService(
             SandboxConfig sandboxConfig,
-            JavaExecutionService javaExecutionService
-    ) {
+            JavaExecutionService javaExecutionService,
+            CExecutionService cExecutionService) {
+
         this.sandboxConfig = sandboxConfig;
         this.javaExecutionService = javaExecutionService;
+        this.cExecutionService = cExecutionService;
     }
 
     public ExecutionResponse execute(ExecutionRequest request) {
@@ -31,9 +35,14 @@ public class PolyglotService {
         String language = request.language();
         String code = request.code();
 
-        // Java uses javac + JVM inside Docker.
+        // Java compilation and execution through Docker.
         if ("java".equalsIgnoreCase(language)) {
             return javaExecutionService.execute(code);
+        }
+
+        // C compilation and execution through GCC Docker image.
+        if ("c".equalsIgnoreCase(language)) {
+            return cExecutionService.execute(code);
         }
 
         long startTime = System.nanoTime();

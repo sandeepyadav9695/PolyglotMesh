@@ -4,6 +4,7 @@ const languages = [
     { id: "python", label: "Python", icon: "🐍" },
     { id: "javascript", label: "JavaScript", icon: "JS" },
     { id: "java", label: "Java", icon: "☕" },
+    { id: "c", label: "C", icon: "C" },
 ];
 export default function LanguageSelector({
                                              language,

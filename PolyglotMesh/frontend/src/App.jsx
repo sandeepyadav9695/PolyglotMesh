@@ -25,6 +25,19 @@ const INITIAL_CODE = {
         System.out.println("Addition: " + (a + b));
     }
 }`,
+
+    c: `#include <stdio.h>
+
+int main() {
+    printf("Hello from PolyglotMesh C Compiler!\\n");
+
+    int a = 10;
+    int b = 20;
+
+    printf("Addition: %d\\n", a + b);
+
+    return 0;
+}`,
 };
 
 function App() {
@@ -51,7 +64,7 @@ function App() {
 
         const currentCode = code[language];
 
-        if (!currentCode.trim()) {
+        if (!currentCode?.trim()) {
             setResult({
                 success: false,
                 output: "",
@@ -66,7 +79,6 @@ function App() {
         setResult(null);
 
         try {
-            // Preserve the existing service signature and backend contract.
             const response = await executeCode(language, currentCode);
             setResult(response);
         } catch (error) {
@@ -105,6 +117,7 @@ function App() {
                 />
 
                 <main className="main-content">
+
                     <section className="welcome-section">
                         <div>
                             <div className="breadcrumb">
@@ -114,8 +127,9 @@ function App() {
                             <h1>Code Playground</h1>
 
                             <p>
-                                Practice, write and execute Python and JavaScript
-                                programs in your own polyglot environment.
+                                Practice, write and execute C, Python,
+                                JavaScript and Java programs in your
+                                polyglot environment.
                             </p>
                         </div>
 
@@ -126,13 +140,17 @@ function App() {
                     </section>
 
                     <section className="workspace">
+
                         <div className="workspace-header">
                             <div>
                                 <h2>Online Compiler</h2>
-                                <p>Write your code and execute it instantly.</p>
+                                <p>
+                                    Write your code and execute it instantly.
+                                </p>
                             </div>
 
                             <div className="workspace-actions">
+
                                 <button
                                     type="button"
                                     className="secondary-button"
@@ -150,6 +168,7 @@ function App() {
                                 >
                                     {loading ? "Executing..." : "▶ Run Code"}
                                 </button>
+
                             </div>
                         </div>
 
@@ -168,31 +187,45 @@ function App() {
                             result={result}
                             loading={loading}
                         />
+
                     </section>
 
                     <section className="feature-grid">
+
                         <article className="feature-card">
                             <span className="feature-icon">⌘</span>
                             <h3>Multi-language</h3>
-                            <p>Write and execute Python and JavaScript code.</p>
+                            <p>
+                                Write and execute C, Python,
+                                JavaScript and Java code.
+                            </p>
                         </article>
 
                         <article className="feature-card">
                             <span className="feature-icon">⚡</span>
                             <h3>Fast execution</h3>
-                            <p>Execute programs using the GraalVM runtime.</p>
+                            <p>
+                                Execute programs using GraalVM,
+                                GCC and the Java runtime.
+                            </p>
                         </article>
 
                         <article className="feature-card">
                             <span className="feature-icon">◈</span>
                             <h3>Sandboxed runtime</h3>
-                            <p>Run programs through your backend execution service.</p>
+                            <p>
+                                Run programs through Docker-based
+                                compiler services and the backend.
+                            </p>
                         </article>
+
                     </section>
 
                     <footer className="app-footer">
-                        PolyglotMesh © 2026 · Powered by Spring Boot and GraalVM
+                        PolyglotMesh © 2026 · Powered by Spring Boot,
+                        GraalVM, GCC and Docker
                     </footer>
+
                 </main>
             </div>
         </div>
